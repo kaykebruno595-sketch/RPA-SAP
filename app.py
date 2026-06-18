@@ -27,7 +27,7 @@ st.title("⚙️ Portal RPA - Tratamento de Relatórios SAP")
 st.write("Carregue os ficheiros extraídos do SAP para realizar o tratamento automático instantâneo.")
 
 # Criar as abas para organizar o site de forma limpa
-aba_me2n, aba_mb51, aba_terceira = st.tabs(["📋 Relatório ME2N", "📦 Relatório MB51"])
+aba_me2n, aba_mb51 = st.tabs(["📋 Relatório ME2N", "📦 Relatório MB51"])
 
 # ==============================================================================
 # ABAS DE TRATAMENTO
