@@ -48,7 +48,7 @@ with aba_me2n:
             df_me2n.columns = df_me2n.columns.str.strip()
             
             # Coloque aqui exatamente como a coluna se chama (cuidado com acentos)
-            coluna_filtro = 'A ser fornecida (quantidade)'
+            coluna_filtro = 'a ser fornecida (quantidade)'
             
             if coluna_filtro in df_me2n.columns:
                 df_me2n = tratar_coluna_numerica(df_me2n, coluna_filtro)
