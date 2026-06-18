@@ -78,7 +78,7 @@ with aba_me2n:
 # --- ABA 2: MB51 ---
 with aba_mb51:
     st.header("Tratamento do Relatório MB51 (Tabela Dinâmica)")
-    st.info("O sistema irá consolidar os dados agrupando por Centro, Material e Texto breve.")
+    st.info("O sistema irá consolidar os dados agrupando por Centro, Material e Texto breve, incluindo o Total Geral.")
     
     ficheiro_mb51 = st.file_uploader("Selecione o ficheiro MB51 (.xlsx ou .xls)", type=["xlsx", "xls"], key="mb51")
     
@@ -87,35 +87,39 @@ with aba_mb51:
             df_mb51 = pd.read_excel(ficheiro_mb51)
             df_mb51.columns = df_mb51.columns.str.strip()
             
-            # Definindo as 3 colunas exatas da sua imagem para agrupar
+            # Definindo as 3 colunas exatas
             colunas_agrupamento = ['Centro', 'Material', 'Texto breve material']
-            col_values = 'Quantidade' # Confirme se o nome da coluna de valor é esse mesmo
+            col_values = 'Quantidade'
             
-            # Verifica se todas as colunas necessárias existem no arquivo
+            # Verifica se todas as colunas existem
             colunas_existem = all(coluna in df_mb51.columns for coluna in colunas_agrupamento + [col_values])
             
             if colunas_existem:
-                # Trata os números gigantes e a pontuação para evitar o erro "1E+07"
+                # Trata os números
                 df_mb51 = tratar_coluna_numerica(df_mb51, col_values)
                 
-                # Tabela dinâmica com as 3 colunas
+                # Tabela dinâmica com as 3 colunas + TOTAL GERAL (margins=True)
                 df_mb51_dinamica = pd.pivot_table(
                     df_mb51,
                     values=col_values,
                     index=colunas_agrupamento,
-                    aggfunc='sum'
+                    aggfunc='sum',
+                    margins=True,               # <--- ISSO AQUI CRIA O TOTAL
+                    margins_name='Total Geral'  # <--- NOME DA LINHA DE TOTAL
                 ).reset_index()
+                
+                # Limpa os campos vazios (NaN) na linha do "Total Geral" para ficar bonito no Excel
+                df_mb51_dinamica = df_mb51_dinamica.fillna('')
                 
                 # Renomeia a coluna final para ficar igual à sua imagem
                 df_mb51_dinamica.rename(columns={col_values: 'Soma de Quantidade'}, inplace=True)
                 
-                st.success("Tabela dinâmica gerada com sucesso!")
+                st.success("Tabela dinâmica com Total Geral gerada com sucesso!")
                 
-                # Exibe formatado no site sem a notação científica
+                # Exibe formatado no site
                 st.dataframe(df_mb51_dinamica.style.format({'Soma de Quantidade': '{:.3f}'}), use_container_width=True)
                 
                 buffer = io.BytesIO()
-                # Salva no Excel. O Pandas cuidará para que fique no formato numérico correto.
                 df_mb51_dinamica.to_excel(buffer, index=False)
                 
                 st.download_button(
@@ -125,7 +129,7 @@ with aba_mb51:
                     mime="application/vnd.ms-excel"
                 )
             else:
-                st.error("Erro: Uma das colunas (Centro, Material, Texto breve material ou Quantidade) não foi encontrada.")
+                st.error("Erro: Uma das colunas não foi encontrada.")
                 st.write("Colunas encontradas no arquivo:", df_mb51.columns.tolist())
                 
         except Exception as e:
