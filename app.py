@@ -36,7 +36,7 @@ aba_me2n, aba_mb51 = st.tabs(["📋 Relatório ME2N", "📦 Relatório MB51"])
 # --- ABA 1: ME2N ---
 with aba_me2n:
     st.header("Tratamento do Relatório ME2N")
-    st.info("O sistema irá filtrar a coluna 'A ser fornecida (quantidade)' removendo valores menores ou iguais a 0.")
+    st.info("O sistema irá filtrar a coluna 'a ser fornecida (quantidade)' removendo valores menores ou iguais a 0.")
     
     ficheiro_me2n = st.file_uploader("Selecione o ficheiro ME2N (.xlsx ou .xls)", type=["xlsx", "xls"], key="me2n")
     
