@@ -36,7 +36,7 @@ aba_me2n, aba_mb51 = st.tabs(["📋 Relatório ME2N", "📦 Relatório MB51"])
 # --- ABA 1: ME2N ---
 with aba_me2n:
     st.header("Tratamento do Relatório ME2N")
-    st.info("O sistema irá filtrar a coluna 'A ser fornecida (quantidade)' removendo valores menores ou iguais a 0 e formatará as datas.")
+    st.info("O sistema irá filtrar a coluna 'a ser fornecida (quantidade)' removendo valores menores ou iguais a 0 e formatará as datas.")
     
     ficheiro_me2n = st.file_uploader("Selecione o ficheiro ME2N (.xlsx ou .xls)", type=["xlsx", "xls"], key="me2n")
     
@@ -47,7 +47,7 @@ with aba_me2n:
             # Limpa espaços em branco no começo e no final de todos os nomes de colunas
             df_me2n.columns = df_me2n.columns.str.strip()
             
-            coluna_filtro = 'A ser fornecida (quantidade)'
+            coluna_filtro = 'a ser fornecida (quantidade)'
             
             if coluna_filtro in df_me2n.columns:
                 # 1. Trata a coluna numérica do filtro
