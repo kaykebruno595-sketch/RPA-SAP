@@ -36,7 +36,7 @@ aba_me2n, aba_mb51 = st.tabs(["📋 Relatório ME2N", "📦 Relatório MB51"])
 # --- ABA 1: ME2N ---
 with aba_me2n:
     st.header("Tratamento do Relatório ME2N")
-    st.info("O sistema irá filtrar a coluna 'a ser fornecida (quantidade)' removendo valores menores ou iguais a 0.")
+    st.info("O sistema irá filtrar a coluna 'A ser fornecida (quantidade)' removendo valores menores ou iguais a 0 e formatará as datas.")
     
     ficheiro_me2n = st.file_uploader("Selecione o ficheiro ME2N (.xlsx ou .xls)", type=["xlsx", "xls"], key="me2n")
     
@@ -47,12 +47,24 @@ with aba_me2n:
             # Limpa espaços em branco no começo e no final de todos os nomes de colunas
             df_me2n.columns = df_me2n.columns.str.strip()
             
-            # Coloque aqui exatamente como a coluna se chama (cuidado com acentos)
-            coluna_filtro = 'a ser fornecida (quantidade)'
+            coluna_filtro = 'A ser fornecida (quantidade)'
             
             if coluna_filtro in df_me2n.columns:
+                # 1. Trata a coluna numérica do filtro
                 df_me2n = tratar_coluna_numerica(df_me2n, coluna_filtro)
-                df_me2n_tratado = df_me2n[df_me2n[coluna_filtro] > 0]
+                df_me2n_tratado = df_me2n[df_me2n[coluna_filtro] > 0].copy()
+                
+                # 2. FORMATAR AS COLUNAS DE DATA PARA O PADRÃO BRASILEIRO (DD/MM/AAAA)
+                colunas_data = ['Dat.rem.estatística', 'Data de remessa', 'Data do documento']
+                
+                for col in colunas_data:
+                    if col in df_me2n_tratado.columns:
+                        # Converte para o tipo Data do Pandas (caso ainda não esteja)
+                        df_me2n_tratado[col] = pd.to_datetime(df_me2n_tratado[col], errors='coerce')
+                        # Transforma no formato DD/MM/AAAA (removendo o 00:00:00)
+                        df_me2n_tratado[col] = df_me2n_tratado[col].dt.strftime('%d/%m/%Y')
+                        # Substitui possíveis erros por texto vazio para não quebrar a planilha
+                        df_me2n_tratado[col] = df_me2n_tratado[col].fillna('')
                 
                 st.success(f"Sucesso! Linhas originais: {len(df_me2n)} | Linhas após filtro: {len(df_me2n_tratado)}")
                 st.dataframe(df_me2n_tratado.head(10), use_container_width=True)
@@ -68,8 +80,7 @@ with aba_me2n:
                 )
             else:
                 st.error(f"Erro: A coluna '{coluna_filtro}' não foi encontrada.")
-                # ISSO AQUI VAI TE SALVAR: Mostra no site as colunas que o Pandas está enxergando
-                st.warning("Estas foram as colunas que o sistema conseguiu ler do seu arquivo. Verifique se o nome está diferente ou se o SAP colocou linhas vazias no topo:")
+                st.warning("Colunas encontradas no arquivo:")
                 st.write(df_me2n.columns.tolist())
                 
         except Exception as e:
